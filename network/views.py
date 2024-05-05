@@ -96,16 +96,18 @@ def toggle_like(request,post_id):
     if request.user.is_authenticated and request.method=="POST":
         try:
             post=get_object_or_404(Post,pk=post_id)                
-            like=Like(user=request.user,post=post)                           
-            is_liked=False               
-        except Like.DoesNotExist:
-            # like the post
-            like=Like(user=request.user,post=post)               
-            like.save()
-            is_liked=True                
-        likes_count=Like.objects.filter(post=post).count()
+            like,created=Like(user=request.user,post=post)  
+            if not created:
+                like.delete()
+                is_liked = False
+            else:
+                is_liked = True
+            likes_count=Like.objects.filter(post=post).count()
         # return render(request,'network/index.html',)
-        return JsonResponse({'likes_count': likes_count, 'is_liked': is_liked})
+            return JsonResponse({'likes_count': likes_count, 'is_liked': is_liked})               
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)              
         
+        # return HttpResponseRedirect(reverse('index'),args=[likes_count,is_liked])
     else:
-        return redirect('login')
+        return JsonResponse({'err': 'User not authenticated'},status=401)
