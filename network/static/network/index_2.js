@@ -3,53 +3,46 @@
 document.addEventListener('DOMContentLoaded',async (e)=>{
    //collect all heart-icon btns
    e.preventDefault()
-   const likeBtns=document.querySelectorAll(".like-btn")   
-   likeBtns.forEach(function(btn){     
+   const likeBtns=document.querySelectorAll(".like-btn")
+   
+   likeBtns.forEach(function(btn){
+     
       btn.addEventListener('click', async(e)=>{
          e.preventDefault()
          const postId=btn.dataset.postId
-         console.log('postId::',postId)             
+         console.log('postId::',postId)    
+         
          // Retrieve stored like data from session
       console.log('{{ request.session.likes_data|escapejs }}');
-      const likeData = JSON.parse('{{ request.session.likes_data|escapejs }}');
-      document.querySelector(`#likes-count-${postId}`).innerHTML=`Number of likes: ${likeData.likes_count}`
+      // const likeData = JSON.parse('{{ request.session.likes_data|escapejs }}');
+      // document.querySelector(`#likes-count-${postId}`).innerHTML=`Number of likes: ${likeData.likes_count}`
       try {            
-         const response = await fetch(`/likes/${postId}`, {
+         await fetch(`/likes/${postId}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "X-CSRFToken": csrfToken
                 },
                 body: JSON.stringify({ postId: postId })
-            });
-            if (response.status!==200) {
-               throw new Error('Network response was not ok');
-           }   
-           // const data = await response.json();
-        
-        //    const responseData = await response.text();
-        //    console.log('Response raw text received from server:', responseData);
-   
-        //        // Parse response data as JSON
-        //    const data = JSON.parse(responseData);
+            })
+            .then(response=>response.json())
+            .then(data=>{
+                console.log('data::',data)
 
-           result=await response.json()
-   
-           console.log('JSON DATA::',result)
+                console.log('JSON DATA::',data)
            
    
-           const likesCountElement = document.querySelector(`#likes-count-${postId}`);
-           likesCountElement.innerHTML = `Number of likes: ${data.likes_count}`;
+                const likesCountElement = document.querySelector(`#likes-count-${postId}`);
+                likesCountElement.innerHTML = `Number of likes: ${data.likes_count}`;
    
-           const heartIcon = btn.querySelector('.heart');
-           heartIcon.style.color = data.is_liked ? 'red' : 'black';
+                const heartIcon = btn.querySelector('.heart');
+                heartIcon.style.color = data.is_liked ? 'red' : 'black';
    
-           window.location.href = '/';
-
+                window.location.href = '/';
+            })
         } catch (error) {
             console.error('Error found::', error);
         } 
-        
       });     
     });
 })
