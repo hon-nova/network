@@ -11,15 +11,7 @@ def index(request):
     
     posts=Post.objects.filter(poster__in=User.objects.all())
     posts=posts.order_by('-timestamp')
-    # logging.debug(f'all posts::{posts}')
-    likes_count={}
-    
-    for post in posts:
-        likes_count[post.id] = Like.objects.filter(post=post).count()
-        logging.debug(likes_count[post.id])
-    
-    logging.debug(f'count likes specific post_id::{likes_count}')
-    return render(request, "network/index.html",{'posts':posts,'likes_count':likes_count})
+    return render(request, "network/index.html",{'posts':posts,})
 
 def login_view(request):
     if request.method == "POST":
@@ -101,22 +93,19 @@ def profile(request,poster_id):
         return redirect('login')
     
 def toggle_like(request,post_id):
-    if request.user.is_authenticated:
-        if request.method=="POST":
-            try:
-                post=get_object_or_404(Post,pk=post_id)
-                # look for a user like in the Like system
-                like=Like(user=request.user,post=post)
-                like.delete()
-                likes_count=Like.objects.filter(post=post).count()
-                return JsonResponse({'likes_count':likes_count})
-            except Like.DoesNotExist:
-                # like the post
-                like=Like(user=request.user,post=post)
-                like.save()
-                likes_count=Like.objects.filter(post=post).count()
-                return JsonResponse({'likes_count':likes_count})
-                
-        return HttpResponseRedirect(reverse('index'))
+    if request.user.is_authenticated and request.method=="POST":
+        try:
+            post=get_object_or_404(Post,pk=post_id)                
+            like=Like(user=request.user,post=post)                           
+            is_liked=False               
+        except Like.DoesNotExist:
+            # like the post
+            like=Like(user=request.user,post=post)               
+            like.save()
+            is_liked=True                
+        likes_count=Like.objects.filter(post=post).count()
+        # return render(request,'network/index.html',)
+        return JsonResponse({'likes_count': likes_count, 'is_liked': is_liked})
+        
     else:
         return redirect('login')

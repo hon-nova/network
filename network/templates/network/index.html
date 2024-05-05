@@ -34,13 +34,14 @@
       <p>{{ post.timestamp }}</p>
       
       <div class="like">
-        <form action="{% url 'likes' post.id %}" method="POST">
-          {%csrf_token%}
-          <button type="submit" id="btnLike" class="like-btn">
-            <i class="bi bi-heart-fill heart"></i>
-          </button>
+        <form id="likeForm{{ post.id }}" action="{% url 'likes' post.id %}" method="POST">
+            {% csrf_token %}
+            <button type="submit" data-post-id="{{ post.id }}" class="like-btn">
+                <i class="bi bi-heart-fill heart"></i>
+            </button>
         </form>
-      </div>
+        <span id="likes-count-{{ post.id }}">{{ post.likes_count }}</span>
+    </div>
     </div>
     {%endfor%} 
   </div>
