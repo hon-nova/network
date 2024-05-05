@@ -146,8 +146,8 @@ def toggle_like(request, post_id):
         request.session['likes_data']=serialized_data
         logging.debug(f'SERIALIZED_DATA ::{serialized_data}')
         logging.debug(f'response_data bare::{response_data}')
-        
-        return HttpResponseRedirect(reverse('index'))
+        return JsonResponse(response_data)
+        # return HttpResponseRedirect(reverse('index'))
     else:
         # Return error response if user is not authenticated or request method is not POST
         return JsonResponse({'error found::': 'User not authenticated or method not allowed'}, status=401)
