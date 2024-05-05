@@ -1,5 +1,53 @@
-{% extends "network/layout.html" %}
-
-{% block body %}
-    TODO
+{% extends "network/layout.html" %} 
+{% load static %}
+{%block title%}Home Page{%endblock%} 
+{%block body %}
+<div class="index-container">
+  <div class="new-post">
+    <form action="{% url 'posts' %}" method="POST">
+      {%csrf_token%}
+      <div class="sub-new-post">
+        <p>New Post:</p>
+        <div class="create-input">
+          <textarea name="content"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Post</button>
+      </div>
+    </form>
+  </div>
+  {%if posts%}
+  <div class="new-post">
+    {%for post in posts %}
+    <div class="sub-new-post">
+      <div class="d-flex">
+        <i class="bi bi-person-bounding-box"></i>
+        <h5 class="mx-1">
+          <a href="{%url 'profile' post.poster.id %}"
+            >{{post.poster.username}}</a
+          >
+        </h5>
+      </div>
+      {%if request.user == post.poster%}
+      <i class="bi bi-pencil-fill pencil" id="btnEdit"></i>
+      {%endif%}
+      <p>{{ post.content }}</p>
+      <p>{{ post.timestamp }}</p>
+      
+      <div class="like">
+        <form action="{% url 'likes' post.id %}" method="POST">
+          {%csrf_token%}
+          <button type="submit" id="btnLike" class="like-btn">
+            <i class="bi bi-heart-fill heart"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+    {%endfor%} 
+  </div>
+  {%endif%}
+  
+</div>
+{%block script%}
+  <script src="{% static 'network/index.js' %}"></script>
+{%endblock%}
 {% endblock %}
