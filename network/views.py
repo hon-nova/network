@@ -6,13 +6,14 @@ from django.urls import reverse
 import logging
 import json
 from .models import User,Post,Like,Follower
-from django.utils.html import escapejs
+
+from django.core.paginator import Paginator,EmptyPage, PageNotAnInteger
 
 logging.basicConfig(level=logging.DEBUG)
 def index(request):
     
     posts=Post.objects.filter(poster__in=User.objects.all())
-    posts=posts.order_by('-timestamp')
+    post_list=posts.order_by('-timestamp')
     # read posts that are liked
     like_counts=[(post.id,post.post_likes.count()) for post in posts]
     # like_counts=tuple(like_counts)
@@ -21,7 +22,19 @@ def index(request):
         logging.debug(f'value::{value}')
     logging.debug(f'like_counts dict ::{like_counts}')
     
-    return render(request, "network/index.html",{'posts':posts,'like_counts':like_counts})
+    paginator = Paginator(posts, 10) 
+    page = request.GET.get('page', 1)
+    try:
+        posts = paginator.page(page)
+    except PageNotAnInteger:
+        posts = paginator.page(1)
+    except EmptyPage:
+        posts = paginator.page(paginator.num_pages)
+        
+
+
+    
+    return render(request, "network/index.html",{'posts':posts,'like_counts':like_counts,})
 
 def login_view(request):
     if request.method == "POST":
@@ -92,10 +105,10 @@ def profile(request,poster_id):
         this_user=User.objects.get(pk=poster_id)
         all_user_posts=this_user.posts.all()
         all_user_posts=all_user_posts.order_by('-timestamp')
-        # logging.debug(f'all_user_posts::{all_user_posts}')
+       
         number_of_my_followers=this_user.followers.count()
         # following_users
-        # logging.debug(f'num_of_my_followers::{number_of_my_followers}')
+       
         number_of_my_following=this_user.following_users.count()
         # logging.debug(f'number_of_my_following::{number_of_my_following}')  
        

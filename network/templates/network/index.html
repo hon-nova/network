@@ -1,7 +1,6 @@
 {% extends "network/layout.html" %} 
 {% load static %}
 {%block title%}Home Page{%endblock%} 
-
 {%block body %}
 <div class="index-container">
   <div class="new-post">
@@ -16,7 +15,7 @@
       </div>
     </form>
   </div>
-  {%if posts and like_counts%}
+{%if posts and like_counts%}
   <div class="new-post">
     {%for post in posts %}
     <div class="sub-new-post">
@@ -28,8 +27,6 @@
           >
         </h5>
       </div>
-     
-
       <div class="editable-content" style="display:none;">
         <form action="{% url 'save_content' post.id%}" method="POST">
           {%csrf_token%}
@@ -40,23 +37,19 @@
           <button type="submit" class="btn btn-sm btn-primary mb-2">Save Changes</button>
         </form>
       </div>
-
       <div class="original-content">
          {%if request.user == post.poster%}
          <span class="pencil-circle"><i class="bi bi-pencil-fill pencil" id="btnEdit"></i></span>
          {%endif%}
-        <p>{{ post.content }}</p>
-        
-      </div>
-     
-      <p><i>{{ post.timestamp }}</i></p>
-      
+        <p>{{ post.content }}</p>        
+      </div>     
+      <p><i>{{ post.timestamp }}</i></p>      
       <div class="like">       
         <button type="button" data-post-id="{{ post.id }}" class="like-btn liked" id="btnLike">
         <i class="bi bi-heart-fill heart" id="heart-icon-{{ post.id }}"></i>
       </button>   
      
-      {% comment %} {%if like_counts%}
+      {% comment %} {%if like_counts%}ƒ
       {% for key,value in like_counts%}         
       <span id="initial-count-{{post.id}}">{{value}}</span> 
          {%endfor%}         
@@ -64,9 +57,34 @@
      
       <span id="likes-count-{{ post.id }}"></span>  
     </div>
-    </div>
-    {%endfor%} 
   </div>
+    {%endfor%}   
+   <div class="pagination-container">       
+    {% if posts.has_other_pages %}
+    <ul class="pagination justify-content-center">
+      {% if posts.has_previous %}
+        <li class="mx-3"><a href="?page={{ posts.previous_page_number }}">Previous</a></li>
+      {% else %}
+        <li class="disabled class="mx-3""><span>Previous</span></li>
+      {% endif %}
+      {% for i in posts.paginator.page_range %}
+        {% if posts.number == i %}
+          <li class="active mx-3"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+        {% else %}
+          <li class="mx-3"><a href="?page={{ i }}">{{ i }}</a></li>
+        {% endif %}
+      {% endfor %}
+      {% if posts.has_next %}
+        <li class="mx-3"><a href="?page={{ posts.next_page_number }}">Next</a></li>
+      {% else %}
+        <li class="disabled mx-3"><span>Next</span></li>
+      {% endif %}
+    </ul>
+  {% endif %}
+    </div>
+  </div>
+  {%else%}
+  <p>No posts have been posted yet!</p>
   {%endif%}
   
 </div>
