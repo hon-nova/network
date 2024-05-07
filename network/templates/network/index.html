@@ -28,15 +28,32 @@
           >
         </h5>
       </div>
-      {%if request.user == post.poster%}
-      <i class="bi bi-pencil-fill pencil" id="btnEdit"></i>
-      {%endif%}
-      <p>{{ post.content }}</p>
-      <p>{{ post.timestamp }}</p>
+     
+
+      <div class="editable-content" style="display:none;">
+        <form action="{% url 'save_content' post.id%}" method="POST">
+          {%csrf_token%}
+      
+          <textarea name="content" class="input-textarea">
+            {{ post.content }}
+          </textarea>
+          <button type="submit" class="btn btn-sm btn-primary mb-2">Save Changes</button>
+        </form>
+      </div>
+
+      <div class="original-content">
+         {%if request.user == post.poster%}
+         <span class="pencil-circle"><i class="bi bi-pencil-fill pencil" id="btnEdit"></i></span>
+         {%endif%}
+        <p>{{ post.content }}</p>
+        
+      </div>
+     
+      <p><i>{{ post.timestamp }}</i></p>
       
       <div class="like">       
         <button type="button" data-post-id="{{ post.id }}" class="like-btn liked" id="btnLike">
-          <i class="bi bi-heart-fill heart" id="heart-icon-{{ post.id }}"></i>
+        <i class="bi bi-heart-fill heart" id="heart-icon-{{ post.id }}"></i>
       </button>   
      
       {% comment %} {%if like_counts%}
@@ -57,4 +74,26 @@
   <script>const csrfToken = "{{ csrf_token }}"</script>
   <script src="{% static 'network/index.js' %}"></script>
 {%endblock%}
+<script>
+   document.addEventListener('DOMContentLoaded',function(){
+
+     let editableContent=document.querySelector(".editable-content")
+     let originContent=document.querySelector(".origininal-content")
+     let btnEdit=document.querySelector("#btnEdit")
+
+     btnEdit.addEventListener('click',()=>{
+       alert('btnEdit got invoked')
+
+       if(editableContent.style.display==="none"){
+         editableContent.style.display="block"
+         originContent.style.display="none"
+         btnEdit.style.display="none"
+       } else {
+         editableContent.style.display="none"
+         originContent.style.display="block"
+         btnEdit.style.display="block"
+       }
+     })
+   })
+ </script>
 {% endblock %}

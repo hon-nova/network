@@ -1,33 +1,31 @@
-{%extends 'network/layout.html'%}
-{%block title%}Profile Page{%endblock%}
+{%extends 'network/layout.html'%} {%block title%}Profile Page{%endblock%}
 {%block body%}
 <div class="profile-container">
-   <h1>Profile: {{poster.username}}</h1>
-   <div class="profile">
-     {%if poster and request.user != poster%}
-     <form action="{% url 'followers' poster.username %}" method="POST">
-      {%csrf_token%}
-      <button type="submit">+ Follow</button>
-     </form>
+  <h1>Profile: {{poster.username}}</h1>
+  <p>All Posts: {{posts|length}}</p>
+  <div class="profile">
+    {%if poster and request.user != poster%} 
      
-     {%endif%}
-      {%if num_followers%}
-      <p>Number of followers: {{ num_followers }}</p>
-      {%endif%}
-      {%if num_following%}
-      <p>Following others: {{ num_following }}</p>
-      {%endif%}
-
-      {%if posts%}
-        
-      {%for post in posts%}
-      <p>{{ post.content }}</p>
-      {%endfor%}
-      {%else%}
-      <p>No posts have been posted yet!</p>
-      {%endif%}
-   </div>
+      {%if request.GET.is_following == 'True'  %}
+     
+    <form action="{% url 'followers' poster.username %}" method="POST">
+      {%csrf_token%}
+      <button type="submit" class="btn btn-sm btn-primary">+ Unfollow</button>
+    </form>
+      {%else%}     
+    <form action="{% url 'followers' poster.username %}" method="POST">
+      {%csrf_token%}
+      <button type="submit" class="btn btn-sm btn-primary">+ Follow</button>
+    </form>
+    {%endif%} {%endif%} {%if num_followers%}
+    <p>Number of followers: {{ num_followers }}</p>
+    {%endif%} {%if num_following%}
+    <p>Following others: {{ num_following }}</p>
+    {%endif%} {%if posts%} {%for post in posts%}
+    <p>{{ post.content }}</p>
+    {%endfor%} {%else%}
+    <p>No posts have been posted yet!</p>
+    {%endif%}
+  </div>
 </div>
-
-
 {%endblock%}

@@ -1,0 +1,20 @@
+{% extends "network/layout.html" %} {%block title%}Home Page{%endblock%} 
+{%block body %}
+<div class="following-container">
+<h1>All My Following User Posts</h1>
+{%if posts%}
+<p>Post(s) found: {{ posts|length }}</p>
+<div class="post">
+   {%for post in posts%}
+   <div class="sub-post">
+      <div class="d-flex">
+         <i class="bi bi-person-bounding-box"></i><h5 class="mx-1"><a href="{% url 'profile' post.poster.id %}">{{post.poster.username}}</a></h5>
+      </div>
+      <p>{{post.created_at}}</p>
+      <p>{{post.content}}</p>      
+   </div>
+   {%endfor%}
+</div>
+{%endif%}
+</div>
+{%endblock%}
