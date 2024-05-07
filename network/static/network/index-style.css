@@ -26,9 +26,12 @@
    cursor: pointer;
 }
 .heart {
-   /* color: red; */
+   color: red;
    border:none;
 }
 #btnLike {
    border:none;
+}
+.hidden{
+   display:none;
 }

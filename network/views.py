@@ -5,7 +5,7 @@ from django.shortcuts import render,redirect,get_object_or_404
 from django.urls import reverse
 import logging
 import json
-from .models import User,Post,Like
+from .models import User,Post,Like,Follower
 from django.utils.html import escapejs
 
 logging.basicConfig(level=logging.DEBUG)
@@ -13,7 +13,15 @@ def index(request):
     
     posts=Post.objects.filter(poster__in=User.objects.all())
     posts=posts.order_by('-timestamp')
-    return render(request, "network/index.html",{'posts':posts,})
+    # read posts that are liked
+    like_counts=[(post.id,post.post_likes.count()) for post in posts]
+    # like_counts=tuple(like_counts)
+    for key,value in like_counts:
+        print(value)
+        logging.debug(f'value::{value}')
+    logging.debug(f'like_counts dict ::{like_counts}')
+    
+    return render(request, "network/index.html",{'posts':posts,'like_counts':like_counts})
 
 def login_view(request):
     if request.method == "POST":
@@ -82,73 +90,71 @@ def save_post(request):
 def profile(request,poster_id):
     if request.user.is_authenticated:
         this_user=User.objects.get(pk=poster_id)
-        user_followers=this_user.followers.all()
+        all_user_posts=this_user.posts.all()
+        all_user_posts=all_user_posts.order_by('-timestamp')
+        # logging.debug(f'all_user_posts::{all_user_posts}')
+        number_of_my_followers=this_user.followers.count()
+        # following_users
+        logging.debug(f'num_of_my_followers::{number_of_my_followers}')
+        number_of_my_following=this_user.following_users.count()
+        logging.debug(f'number_of_my_following::{number_of_my_following}')
+     
        
-        user_following=this_user.following.all()    
-        # all posts of this user,reverse order
-        user_posts=this_user.posts.all()
-        user_posts=user_posts.order_by('-created_at')
         # MUST KNOW user must log in to display Follow or Unfollow btn
-        return render(request,'network/profile.html',{'followers':user_followers,'following':user_following, 'all_posts':user_posts})
+        return render(request,'network/profile.html',{'posts':all_user_posts,'num_followers':number_of_my_followers,'num_following':number_of_my_following,'poster':this_user})
     
+    else:
+        return redirect('login')  
+    
+def toggle_like(request, post_id):
+    if request.method == "POST":
+        post=get_object_or_404(Post,pk=post_id)
+        user=request.user
+                
+        # Step 1: find all users who like this post
+        all_likes_this_post=Like.objects.filter(post__id=post_id)
+        all_users_liked_this_post=[object.user for object in all_likes_this_post]
+        
+        # Step 2: filter out this current user only
+        if user in all_users_liked_this_post:
+            Like.objects.filter(user=user).delete()
+            liked=False
+        else:
+            like=Like.objects.create(user=user,post=post)
+            like.save()
+            liked=True
+            
+        posts=Post.objects.all()
+        # like_counts={post.id:Like.objects.filter(post=post).count()  for post in posts}
+        like_counts={post.id:post.post_likes.count() for post in posts}
+        
+        # logging.debug(f'show all like_counts dict::{like_counts}')            
+        
+        return JsonResponse({'liked':liked,'like_counts':like_counts})
+       
+    else:        
+        return JsonResponse({'error found::': 'User not authenticated or method not allowed'}, status=401)
+    
+def save_follower(request,poster_username):
+    if request.user.is_authenticated:
+        if request.method=="POST":
+            
+            poster=get_object_or_404(User,username=poster_username)
+        
+            is_already_following=request.user.following_users.filter(followed=poster).exists()
+            
+            if not is_already_following: 
+                follower=Follower(follower=request.user,followed=poster)                            
+               
+                follower.is_followed=True
+                follower.save()
+            else:
+                follower=request.user.following_users.filter(followed=poster) 
+                follower.delete()  
+                
+            return HttpResponseRedirect(reverse('profile',args=[poster.id]))
     else:
         return redirect('login')
     
-# def toggle_like(request,post_id):
-#     if request.user.is_authenticated and request.method=="POST":
-#         post=get_object_or_404(Post,pk=post_id)  
-#         data=request.body
-#         logging.debug(f'data::{data}')
-#         logging.debug(f'post_id::{post_id}')
-#         try:
-#             like,created = Like.objects.get(user=request.user, post=post)
-#             like.delete()
-#             is_liked = False
-#         except Like.DoesNotExist:
-#             like = Like(user=request.user, post=post)
-#             like.save()
-#             is_liked = True 
-#         except Exception as e:   
-            
-#             return JsonResponse({'error found::':str(e)},status=501)  
-        
-#         likes_count=Like.objects.filter(post=post).count()   
-#         return JsonResponse({'likes_count':likes_count,'is_liked':is_liked})
-       
-#     else:
-#         return JsonResponse({'ERROR USER FOUND::': 'User not authenticated'},status=401)
-
-def toggle_like(request, post_id):
-    if request.user.is_authenticated and request.method == "POST":
-        post = get_object_or_404(Post, pk=post_id)
-        data=request.body
-        # logging.debug(f'data::{data}')     
-        # logging.debug(f'post_id::{post_id}')
-        
-        try:
-            # Attempt to retrieve the like object for the current user and post
-            like = Like.objects.get(user=request.user, post=post)            
-            # If the like object exists, delete it (unlike the post)
-            like.delete()
-            is_liked = False            
-        except Like.DoesNotExist:
-            # If the like object does not exist, create it (like the post)
-            like = Like(user=request.user, post=post)
-            like.save()
-            is_liked = True
-
-        likes_count = Like.objects.filter(post=post).count()       
-        response_data={'likes_count':likes_count,'is_liked':is_liked,}
-        
-        # Serialize and escape the JSON data
-        serialized_data = escapejs(json.dumps(response_data))
-        # save/store in session
-        request.session['likes_data']=serialized_data
-        logging.debug(f'SERIALIZED_DATA ::{serialized_data}')
-        logging.debug(f'response_data bare::{response_data}')
-        return JsonResponse(response_data)
-        # return HttpResponseRedirect(reverse('index'))
-    else:
-        # Return error response if user is not authenticated or request method is not POST
-        return JsonResponse({'error found::': 'User not authenticated or method not allowed'}, status=401)
+    
         

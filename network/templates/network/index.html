@@ -16,7 +16,7 @@
       </div>
     </form>
   </div>
-  {%if posts%}
+  {%if posts and like_counts%}
   <div class="new-post">
     {%for post in posts %}
     <div class="sub-new-post">
@@ -34,13 +34,18 @@
       <p>{{ post.content }}</p>
       <p>{{ post.timestamp }}</p>
       
-      <div class="like">
-       
+      <div class="like">       
         <button type="button" data-post-id="{{ post.id }}" class="like-btn liked" id="btnLike">
           <i class="bi bi-heart-fill heart" id="heart-icon-{{ post.id }}"></i>
-      </button>
-      <span id="likes-count-{{ post.id }}">Number of likes: </span>
-            
+      </button>   
+     
+      {% comment %} {%if like_counts%}
+      {% for key,value in like_counts%}         
+      <span id="initial-count-{{post.id}}">{{value}}</span> 
+         {%endfor%}         
+      {%endif%} {% endcomment %}
+     
+      <span id="likes-count-{{ post.id }}"></span>  
     </div>
     </div>
     {%endfor%} 
