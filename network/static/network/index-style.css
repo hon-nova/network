@@ -18,6 +18,14 @@
    border:1px solid #d0d5d5;   
    box-sizing: border-box;
 }
+.person {
+   border-radius:15px;
+   border:1px solid #d0d0d5;
+   margin-top:10px;
+}
+.network-icon{
+   border-radius: 50%;
+}
 
 .heart {
    color: red;

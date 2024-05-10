@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect,JsonResponse
 from django.shortcuts import render,redirect,get_object_or_404
@@ -30,10 +31,6 @@ def index(request):
         posts = paginator.page(1)
     except EmptyPage:
         posts = paginator.page(paginator.num_pages)
-        
-
-
-    
     return render(request, "network/index.html",{'posts':posts,'like_counts':like_counts,})
 
 def login_view(request):
@@ -116,44 +113,44 @@ def profile(request,poster_id):
     
     else:
         return redirect('login')  
-    
+ 
+  
 def toggle_like(request, post_id):
-    if request.method == "POST":
-        post=get_object_or_404(Post,pk=post_id)
-        user=request.user
-                
-        # Step 1: find all users who like this post
-        all_likes_this_post=Like.objects.filter(post__id=post_id)
-        all_users_liked_this_post=[object.user for object in all_likes_this_post]
-        
-        # Step 2: filter out this current user only
-        if user in all_users_liked_this_post:
-            Like.objects.filter(user=user).delete()
-            liked=False
-        else:
-            like=Like.objects.create(user=user,post=post)
-            like.save()
-            liked=True
+   
+        if request.method == "POST":
+            post=get_object_or_404(Post,pk=post_id)
+            user=request.user
+                    
+            # Step 1: find all users who like this post
+            all_likes_this_post=Like.objects.filter(post__id=post_id)
+            all_users_liked_this_post=[object.user for object in all_likes_this_post]
             
-        posts=Post.objects.all()
-        # like_counts={post.id:Like.objects.filter(post=post).count()  for post in posts}
-        like_counts={post.id:post.post_likes.count() for post in posts}
+            # Step 2: filter out this current user only
+            if user in all_users_liked_this_post:
+                Like.objects.filter(user=user).delete()
+                liked=False
+            else:
+                like=Like.objects.create(user=user,post=post)
+                like.save()
+                liked=True
+                
+            posts=Post.objects.all()
+            # like_counts={post.id:Like.objects.filter(post=post).count()  for post in posts}
+            like_counts={post.id:post.post_likes.count() for post in posts}
+            
+            # logging.debug(f'show all like_counts dict::{like_counts}')            
+            
+            return JsonResponse({'liked':liked,'like_counts':like_counts})
         
-        # logging.debug(f'show all like_counts dict::{like_counts}')            
-        
-        return JsonResponse({'liked':liked,'like_counts':like_counts})
-       
-    else:        
-        return JsonResponse({'error found::': 'User not authenticated or method not allowed'}, status=401)
+        else:        
+            return JsonResponse({'error found::': 'User not authenticated or method not allowed'}, status=401)
+   
     
 def save_follower(request,poster_username):
     if request.user.is_authenticated:
-        if request.method=="POST":
-            
-            poster=get_object_or_404(User,username=poster_username)
-        
-            is_already_following=request.user.following_users.filter(followed=poster).exists()
-            
+        if request.method=="POST":            
+            poster=get_object_or_404(User,username=poster_username)        
+            is_already_following=request.user.following_users.filter(followed=poster).exists()            
             if not is_already_following: 
                 follower=Follower(follower=request.user,followed=poster)
                 follower.save()
@@ -162,8 +159,7 @@ def save_follower(request,poster_username):
                 follower.delete() 
             is_following=request.user.following_users.filter(followed=poster).exists()
             logging.debug(f'is_following::{is_following}')
-            return HttpResponseRedirect(reverse('profile',args=[poster.id]) + f'?is_following={is_following}')
-           
+            return HttpResponseRedirect(reverse('profile',args=[poster.id]) + f'?is_following={is_following}')           
     else:
         return redirect('login')
     

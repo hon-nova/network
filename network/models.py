@@ -25,17 +25,5 @@ class Like(models.Model):
     class Meta:
         unique_together = ['user', 'post']
         
-    @classmethod    
-    def get_posts_num_likes(cls):
-        posts_num_likes={}
-        
-        # step 1: get all posts that are liked
-        liked_posts= cls.objects.values('post').annotate(num_likes=models.Count('post'))
-        
-        for liked_post in liked_posts:
-            post_id=liked_post['post']
-            num_likes=liked_post['num_likes']
-            posts_num_likes[post_id]=num_likes
-            
-        return posts_num_likes        
+       
        
