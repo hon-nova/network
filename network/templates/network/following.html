@@ -1,32 +1,77 @@
-{% extends "network/layout.html" %} {%block title%}Following Page{%endblock%} 
+{% extends "network/layout.html" %} {%block title%}
+{% load static %}llowing Page{%endblock%} 
 {%block body %}
 <div class="following-container row">
 <div class="col-3 left">
    {%if request.user.is_authenticated %}
-      <div class="d-flex person">       
+      <div class="d-flex person">  
+         <img src="{% static 'network/images/person.png' %}" alt='person' width="100" height="85" />     
          <div class="sub-person ml-2">
             <h5>{{request.user.username}}</h5>
             <p><i>{{request.user.email}}</i></p>
          </div>
       </div>   
+      {%else%}
+      <p>You're not logged in.</p>
    {% endif %}
 </div>
 <div class="col-8">
+   {%if post_counts%}
+   <p>Posts({{ post_counts}})</p>
+   {%endif%}
    {%if posts%}
-<p>Post(s): {{ posts|length }}</p>
+
 <div class="new-post">
    {%for post in posts%}
    <div class="sub-new-post">
       <div class="d-flex">
          <i class="bi bi-person-bounding-box"></i><h5 class="mx-1"><a href="{% url 'profile' post.poster.id %}">{{post.poster.username}}</a></h5>
       </div>
-      <p>{{post.created_at}}</p>
-      <p>{{post.content}}</p>      
+     
+      <p class="original-content">{{post.content}}</p>   
+      <p><i>{{post.timestamp}}</i></p>   
+      <div class="like">       
+         <button type="button" data-post-id="{{ post.id }}" class="like-btn liked" id="btnLike">
+         <i class="bi bi-heart-fill heart" id="heart-icon-{{ post.id }}"></i>
+       </button>  
+       <span id="likes-count-{{ post.id }}"></span>  
+     </div>
    </div>
    {%endfor%}
+   {% comment %} pagination {% endcomment %}
+   <div class="pagination-container">       
+      {% if posts.has_other_pages %}
+        <ul class="pagination justify-content-center">
+        {% if posts.has_previous %}
+          <li class="mx-3"><a href="?page={{ posts.previous_page_number }}">Previous</a></li>
+        {% else %}
+          <li class="disabled class="mx-3""><span>Previous</span></li>
+        {% endif %}
+        {% for i in posts.paginator.page_range %}
+          {% if posts.number == i %}
+            <li class="active mx-3"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+          {% else %}
+            <li class="mx-3"><a href="?page={{ i }}">{{ i }}</a></li>
+          {% endif %}
+        {% endfor %}
+        {% if posts.has_next %}
+          <li class="mx-3"><a href="?page={{ posts.next_page_number }}">Next</a></li>
+        {% else %}
+          <li class="disabled mx-3"><span>Next</span></li>
+        {% endif %}
+        </ul>
+     {% endif %}
+        </div>
+
+
+
 </div>
 {%endif%}
 </div>
 
 </div>
+{%block script%}
+  <script>const csrfToken = "{{ csrf_token }}"</script>
+  <script src="{% static 'network/index.js' %}"></script>
+{%endblock%}
 {%endblock%}

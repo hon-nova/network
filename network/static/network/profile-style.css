@@ -1,19 +1,24 @@
 .profile-container{
-   margin:0 15px;
-   border: 5px solid green;
+   /* margin:0 15px; */
+   /* border: 5px solid green; */
    box-sizing: border-box;
 }
-.profile{
-   border:5px solid #d0d5d5;
+/* .profile{
+   border:5px solid red;
    margin:10px;
-}
+} */
 .sub-profile{
    margin:15px;  
    border:1px solid goldenrod;
 }
 .post-content{
-   border: 1px solid lightgray;
+   /* border: 1px solid lightgray; */
    padding: 5px;
    border-radius: 5px;
    
+}
+.follow,.unfollow{
+   border-radius: 15px;
+   background-color: black;
+   margin-left:20px;
 }

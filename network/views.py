@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.DEBUG)
 def index(request):
     
     posts=Post.objects.filter(poster__in=User.objects.all())
-    posts_count=len(posts)
+    post_counts=len(posts)
     # logging.debug(f'posts_count::{posts_count}')
     posts=posts.order_by('-timestamp')
     # read posts that are liked
@@ -35,7 +35,7 @@ def index(request):
         posts = paginator.page(1)
     except EmptyPage:
         posts = paginator.page(paginator.num_pages)
-    return render(request, "network/index.html",{'posts':posts,'like_counts':like_counts,'post_counts':posts_count})
+    return render(request, "network/index.html",{'posts':posts,'like_counts':like_counts,'post_counts':post_counts})
 
 def login_view(request):
     if request.method == "POST":
@@ -175,10 +175,22 @@ def following(request):
         all_users_posts=[]
         
         all_users_posts=Post.objects.filter(poster__in=all_users_i_follow)
-       
+        post_counts=len(all_users_posts)
         all_users_posts=all_users_posts.order_by('-timestamp')
         logging.debug(f'all_users_posts::{all_users_posts}')
-    return render(request,'network/following.html',{'posts':all_users_posts})
+        
+        # change posts to all_users_posts 
+        paginator = Paginator(all_users_posts, 4) 
+        page = request.GET.get('page', 1)
+        try:
+            all_users_posts = paginator.page(page)
+        except PageNotAnInteger:
+            all_users_posts = paginator.page(1)
+        except EmptyPage:
+            all_users_posts = paginator.page(paginator.num_pages)
+            
+        # end 
+    return render(request,'network/following.html',{'posts':all_users_posts,'post_counts':post_counts})
 
 def save_content(request,post_id):
     if request.method=="POST":

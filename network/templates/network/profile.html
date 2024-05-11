@@ -1,32 +1,74 @@
-{%extends 'network/layout.html'%} {%block title%}Profile Page{%endblock%}
+{%extends 'network/layout.html'%} 
+{%block title%}Profile Page{%endblock%}
+{%load static%}
 {%block body%}
-<div class="profile-container">
-  <h1>Profile: {{poster.username}}</h1>
-  <p>All Posts: {{posts|length}}</p>
-  <div class="profile">
-    {%if poster and request.user != poster%} 
-     
-      {%if request.GET.is_following == 'True'  %}
-     
-    <form action="{% url 'followers' poster.username %}" method="POST">
-      {%csrf_token%}
-      <button type="submit" class="btn btn-sm btn-primary">+ Unfollow</button>
-    </form>
-      {%else%}     
-    <form action="{% url 'followers' poster.username %}" method="POST">
-      {%csrf_token%}
-      <button type="submit" class="btn btn-sm btn-primary">+ Follow</button>
-    </form>
-    {%endif%} {%endif%} {%if num_followers%}
-    <p>Number of followers: {{ num_followers }}</p>
-    {%endif%} {%if num_following%}
-    <p>Following others: {{ num_following }}</p>
-    {%endif%} {%if posts%} {%for post in posts%}
-    <p>{{ post.content }}</p>
-    <p><i>{{ post.timestamp }}</i></p>
-    {%endfor%} {%else%}
-    <p>No posts have been posted yet!</p>
+<div class="profile-container row">
+  <div class="col-3 left">
+    {%if request.user.is_authenticated%}
+    <div class="d-flex person">
+       <img src="{% static 'network/images/person.png' %}" alt='person' width="100" height="85" />
+       <div class="sub-person ml-2">
+          <h5>{{request.user.username}}</h5>
+          <p><i>{{request.user.email}}</i></p>
+       </div>
+    </div>
+    {%else%}
+    <p>You're not logged in.</p>
     {%endif%}
   </div>
+  <div class="col-md-8">   
+    <div class="new-post">
+      <h1>Profile: {{poster.username}}</h1>
+      {%if poster and request.user != poster%} 
+       
+        {%if request.GET.is_following == 'True'  %}
+       
+      <form action="{% url 'followers' poster.username %}" method="POST">
+        {%csrf_token%}
+        <button type="submit" class="btn btn-sm btn-primary unfollow">+ Unfollow</button>
+      </form>
+        {%else%}     
+      <form action="{% url 'followers' poster.username %}" method="POST">
+        {%csrf_token%}
+        <button type="submit" class="btn btn-sm btn-primary follow">+ Follow</button>
+      </form>
+      {%endif%} {%endif%} 
+      <ul>
+        {%if num_followers%}
+        <li>Followers: {{ num_followers }}</li>
+        {%endif%} {%if num_following%}
+        <li>Following others: {{ num_following }}</li>
+        {%endif%} 
+      </ul>
+      <hr/>
+     
+  {%if posts%} 
+      <div class="">
+        <p class="ml-3">Posts({{posts|length}})</p>
+        {%for post in posts%}
+        <div class="sub-new-post">
+          <p class="original-content">{{ post.content }}</p>
+          <p><i>{{ post.timestamp }}</i></p>
+          <div class="like">       
+            <button type="button" data-post-id="{{ post.id }}" class="like-btn liked" id="btnLike">
+            <i class="bi bi-heart-fill heart" id="heart-icon-{{ post.id }}"></i>
+          </button>  
+          <span id="likes-count-{{ post.id }}"></span> 
+        </div>
+        
+      </div>
+        {%endfor%} 
+      </div>
+
+      {%else%}
+      <p>No posts have been posted yet!</p>
+      {%endif%}
+    </div>
+  </div>
+ 
 </div>
+{%block script%}
+  <script>const csrfToken = "{{ csrf_token }}"</script>
+  <script src="{% static 'network/index.js' %}"></script>
+{%endblock%}
 {%endblock%}

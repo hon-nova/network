@@ -13,6 +13,8 @@
             <p><i>{{request.user.email}}</i></p>
          </div>
       </div>
+      {%else%}
+      <p>You're not logged in.</p>
       {%endif%}
    </div>
    <div class="col-8">
@@ -63,19 +65,12 @@
            <div class="like">       
              <button type="button" data-post-id="{{ post.id }}" class="like-btn liked" id="btnLike">
              <i class="bi bi-heart-fill heart" id="heart-icon-{{ post.id }}"></i>
-           </button>   
-          
-           {% comment %} {%if like_counts%}ƒ
-           {% for key,value in like_counts%}         
-           <span id="initial-count-{{post.id}}">{{value}}</span> 
-              {%endfor%}         
-           {%endif%} {% endcomment %}
-          
+           </button>  
            <span id="likes-count-{{ post.id }}"></span>  
          </div>
        </div>
          {%endfor%}   
-           <div class="pagination-container">       
+         <div class="pagination-container">       
          {% if posts.has_other_pages %}
            <ul class="pagination justify-content-center">
            {% if posts.has_previous %}
@@ -102,7 +97,7 @@
        {%else%}
        <p>No posts have been posted yet!</p>
        {%endif%}
-   </div>
+      </div>
 
   
 </div>
