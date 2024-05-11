@@ -18,8 +18,10 @@
 <div class="col-8">
    {%if post_counts%}
    <p>Posts({{ post_counts}})</p>
+   {%else%}
+   <p class="mt-4 justify-content-center">You are currently not following any posters.</p>
    {%endif%}
-   {%if posts%}
+{%if posts%}
 
 <div class="new-post">
    {%for post in posts%}
