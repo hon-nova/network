@@ -15,11 +15,10 @@ def index(request):
     
     posts=Post.objects.filter(poster__in=User.objects.all())
     post_counts=len(posts)
-    # logging.debug(f'posts_count::{posts_count}')
-    posts=posts.order_by('-timestamp')
-    # read posts that are liked
+   
+    posts=posts.order_by('-timestamp')    
     like_counts=[{post.id:post.post_likes.count()} for post in posts]
-    # like_counts=tuple(like_counts)
+   
     key_to_display = 'id'
 
     for item in like_counts:
@@ -108,10 +107,8 @@ def profile(request,poster_id):
         all_user_posts=all_user_posts.order_by('-timestamp')
        
         number_of_my_followers=this_user.followers.count()
-        # following_users
        
         number_of_my_following=this_user.following_users.count()
-        # logging.debug(f'number_of_my_following::{number_of_my_following}')  
        
         return render(request,'network/profile.html',{'posts':all_user_posts,'num_followers':number_of_my_followers,'num_following':number_of_my_following,'poster':this_user})
     
@@ -119,36 +116,29 @@ def profile(request,poster_id):
         return redirect('login')  
  
   
-def toggle_like(request, post_id):
-   
-        if request.method == "POST":
-            post=get_object_or_404(Post,pk=post_id)
-            user=request.user
-                    
-            # Step 1: find all users who like this post
-            all_likes_this_post=Like.objects.filter(post__id=post_id)
-            all_users_liked_this_post=[object.user for object in all_likes_this_post]
-            
-            # Step 2: filter out this current user only
-            if user in all_users_liked_this_post:
-                Like.objects.filter(user=user).delete()
-                liked=False
-            else:
-                like=Like.objects.create(user=user,post=post)
-                like.save()
-                liked=True
+def toggle_like(request, post_id):   
+    if request.method == "POST":
+        post=get_object_or_404(Post,pk=post_id)
+        user=request.user
                 
-            posts=Post.objects.all()
-            # like_counts={post.id:Like.objects.filter(post=post).count()  for post in posts}
-            like_counts={post.id:post.post_likes.count() for post in posts}
-            
-            # logging.debug(f'show all like_counts dict::{like_counts}')            
-            
-            return JsonResponse({'liked':liked,'like_counts':like_counts})
+        all_likes_this_post=Like.objects.filter(post__id=post_id)
+        all_users_liked_this_post=[object.user for object in all_likes_this_post]
         
-        else:        
-            return JsonResponse({'error found::': 'User not authenticated or method not allowed'}, status=401)
-   
+        if user in all_users_liked_this_post:
+            Like.objects.filter(user=user).delete()
+            liked=False
+        else:
+            like=Like.objects.create(user=user,post=post)
+            like.save()
+            liked=True
+            
+        posts=Post.objects.all()
+        like_counts={post.id:post.post_likes.count() for post in posts}         
+        
+        return JsonResponse({'liked':liked,'like_counts':like_counts})
+    
+    else:        
+        return JsonResponse({'error found::': 'User not authenticated or method not allowed'}, status=401)
     
 def save_follower(request,poster_username):
     if request.user.is_authenticated:
@@ -169,17 +159,15 @@ def save_follower(request,poster_username):
     
 def following(request):
     if request.user.is_authenticated:
-        # all_users_i_follow=request.user.following_users.all()
-        #  Retrieve all users that the current user is following
+    
         all_users_i_follow = User.objects.filter(followers__follower=request.user)
         all_users_posts=[]
         
         all_users_posts=Post.objects.filter(poster__in=all_users_i_follow)
         post_counts=len(all_users_posts)
         all_users_posts=all_users_posts.order_by('-timestamp')
-        logging.debug(f'all_users_posts::{all_users_posts}')
+        logging.debug(f'all_users_posts::{all_users_posts}')        
         
-        # change posts to all_users_posts 
         paginator = Paginator(all_users_posts, 4) 
         page = request.GET.get('page', 1)
         try:
@@ -187,9 +175,8 @@ def following(request):
         except PageNotAnInteger:
             all_users_posts = paginator.page(1)
         except EmptyPage:
-            all_users_posts = paginator.page(paginator.num_pages)
-            
-        # end 
+            all_users_posts = paginator.page(paginator.num_pages)            
+       
     return render(request,'network/following.html',{'posts':all_users_posts,'post_counts':post_counts})
 
 def save_content(request,post_id):

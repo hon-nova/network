@@ -21,8 +21,7 @@
       <h1>Profile: {{poster.username}}</h1>
       {%if poster and request.user != poster%} 
        
-        {%if request.GET.is_following == 'True'  %}
-       
+        {%if request.GET.is_following == 'True'  %}       
       <form action="{% url 'followers' poster.username %}" method="POST">
         {%csrf_token%}
         <button type="submit" class="btn btn-sm btn-primary unfollow">+ Unfollow</button>
@@ -40,8 +39,7 @@
         <li>Following others: {{ num_following }}</li>
         {%endif%} 
       </ul>
-      <hr/>
-     
+      <hr/>     
   {%if posts%} 
       <div class="">
         <p class="ml-3">Posts({{posts|length}})</p>
@@ -55,17 +53,14 @@
           </button>  
           <span id="likes-count-{{ post.id }}"></span> 
         </div>
-        
       </div>
         {%endfor%} 
       </div>
-
       {%else%}
       <p>No posts have been posted yet!</p>
       {%endif%}
     </div>
   </div>
- 
 </div>
 {%block script%}
   <script>const csrfToken = "{{ csrf_token }}"</script>
