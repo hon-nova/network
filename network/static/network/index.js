@@ -34,10 +34,8 @@ document.addEventListener("DOMContentLoaded", () => {
         )        
         // Update the likes count in the UI		 
         if (likesCountElement){        
-         likesCountElement.textContent = `${data.like_counts[postId]}`;
-         
-        }    
-      //   console.log('data.like-counts::',data.like_counts) 
+         likesCountElement.textContent = `${data.like_counts[postId]}`;         
+        }   
 
       likeCounts[postId] = data.like_counts[postId];
        

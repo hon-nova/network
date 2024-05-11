@@ -45,19 +45,18 @@
                >
              </h5>
            </div>
-           <div class="editable-content" style="display:none;">
+           <div id="editable-content-{{ post.id }}" style="display:none;">
              <form action="{% url 'save_content' post.id%}" method="POST">
-               {%csrf_token%}
-           
+               {%csrf_token%}           
                <textarea name="content" class="input-textarea">
                  {{ post.content }}
                </textarea>
                <button type="submit" class="btn btn-sm btn-primary mb-2">Save Changes</button>
              </form>
            </div>
-           <div class="original-content">
+           <div id="original-content-{{ post.id }}">
               {%if request.user == post.poster%}
-              <span class="pencil-circle"><i class="bi bi-pencil-fill pencil" id="btnEdit"></i></span>
+              <button type="submit" class="pencil-circle" onclick="enableEdit({{ post.id }})"><i class="bi bi-pencil-fill pencil" id="btnEdit"></i></button>
               {%endif%}
              <p>{{ post.content }}</p>        
            </div>     
@@ -104,25 +103,23 @@
   <script src="{% static 'network/index.js' %}"></script>
 {%endblock%}
 <script>
-   document.addEventListener('DOMContentLoaded',function(){
-
-     let editableContent=document.querySelector(".editable-content")
-     let originContent=document.querySelector(".origininal-content")
-     let btnEdit=document.querySelector("#btnEdit")
-
-     btnEdit.addEventListener('click',()=>{
-       alert('btnEdit got invoked')
-
-       if(editableContent.style.display==="none"){
-         editableContent.style.display="block"
-         originContent.style.display="none"
-         btnEdit.style.display="none"
-       } else {
-         editableContent.style.display="none"
-         originContent.style.display="block"
-         btnEdit.style.display="block"
-       }
-     })
-   })
+   const enableEdit=(postId)=>{
+      let editableContent=document.querySelector(`#editable-content-${postId}`)
+      let originContent=document.querySelector(`#original-content-${postId}`)
+      let btnEdit=document.querySelector("#btnEdit") 
+     
+       //alert('btnEdit got invoked')
+ 
+        if(editableContent.style.display==="block"){
+          editableContent.style.display="none"
+          originContent.style.display="block"
+          btnEdit.style.display="block"
+        } else {
+          editableContent.style.display="block"
+          originContent.style.display="none"
+          btnEdit.style.display="none"
+        }
+   }
+   
  </script>
 {% endblock %}

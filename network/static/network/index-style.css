@@ -35,7 +35,6 @@
 .network-icon{
    border-radius: 50%;
 }
-
 .heart {
    color: red;
    border:none;
@@ -43,17 +42,15 @@
 #btnLike {
    border:none;
 }
-.hidden{
-   display:none;
-}
-.original-content{
+
+#original-content{
    position: relative;
    border-left: 5px dotted  black;
    border-right:5px dotted  black;
    padding-left: 5px;   
    margin: 5px;
 }
-.original-content .pencil {
+#original-content .pencil {
    color: blue;
    cursor: pointer;  
 }
