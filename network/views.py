@@ -14,14 +14,18 @@ logging.basicConfig(level=logging.DEBUG)
 def index(request):
     
     posts=Post.objects.filter(poster__in=User.objects.all())
-    post_list=posts.order_by('-timestamp')
+    posts_count=len(posts)
+    # logging.debug(f'posts_count::{posts_count}')
+    posts=posts.order_by('-timestamp')
     # read posts that are liked
-    like_counts=[(post.id,post.post_likes.count()) for post in posts]
+    like_counts=[{post.id:post.post_likes.count()} for post in posts]
     # like_counts=tuple(like_counts)
-    for key,value in like_counts:
-        print(value)
-        logging.debug(f'value::{value}')
-    logging.debug(f'like_counts dict ::{like_counts}')
+    key_to_display = 'id'
+
+    for item in like_counts:
+        if key_to_display in item:
+           
+            logging.debug(f'{item[key_to_display]}')
     
     paginator = Paginator(posts, 10) 
     page = request.GET.get('page', 1)
@@ -31,7 +35,7 @@ def index(request):
         posts = paginator.page(1)
     except EmptyPage:
         posts = paginator.page(paginator.num_pages)
-    return render(request, "network/index.html",{'posts':posts,'like_counts':like_counts,})
+    return render(request, "network/index.html",{'posts':posts,'like_counts':like_counts,'post_counts':posts_count})
 
 def login_view(request):
     if request.method == "POST":

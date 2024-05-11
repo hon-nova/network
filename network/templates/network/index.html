@@ -4,12 +4,11 @@
 {%block body %}
 
 <div class="index-container row">
-
-   <div class="col-3">
+   <div class="col-3 left">
     {%if request.user.is_authenticated%}
       <div class="d-flex person">
-         <img src="{% static 'network/images/person.png' %}" alt='person' width="100" height="85" class="mx-2"/>
-         <div>
+         <img src="{% static 'network/images/person.png' %}" alt='person' width="100" height="85" />
+         <div class="sub-person ml-2">
             <h5>{{request.user.username}}</h5>
             <p><i>{{request.user.email}}</i></p>
          </div>
@@ -29,6 +28,9 @@
            </div>
          </form>
        </div>
+       {%if post_counts%}
+       <p class="ml-3">Posts: {{post_counts}}</p>
+       {%endif%}
      {%if posts and like_counts%}
        <div class="new-post">
          {%for post in posts %}

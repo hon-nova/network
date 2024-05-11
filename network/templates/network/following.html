@@ -1,12 +1,22 @@
-{% extends "network/layout.html" %} {%block title%}Home Page{%endblock%} 
+{% extends "network/layout.html" %} {%block title%}Following Page{%endblock%} 
 {%block body %}
-<div class="following-container">
-<h1>All My Following User Posts</h1>
-{%if posts%}
-<p>Post(s) found: {{ posts|length }}</p>
-<div class="post">
+<div class="following-container row">
+<div class="col-3 left">
+   {%if request.user.is_authenticated %}
+      <div class="d-flex person">       
+         <div class="sub-person ml-2">
+            <h5>{{request.user.username}}</h5>
+            <p><i>{{request.user.email}}</i></p>
+         </div>
+      </div>   
+   {% endif %}
+</div>
+<div class="col-8">
+   {%if posts%}
+<p>Post(s): {{ posts|length }}</p>
+<div class="new-post">
    {%for post in posts%}
-   <div class="sub-post">
+   <div class="sub-new-post">
       <div class="d-flex">
          <i class="bi bi-person-bounding-box"></i><h5 class="mx-1"><a href="{% url 'profile' post.poster.id %}">{{post.poster.username}}</a></h5>
       </div>
@@ -16,5 +26,7 @@
    {%endfor%}
 </div>
 {%endif%}
+</div>
+
 </div>
 {%endblock%}
