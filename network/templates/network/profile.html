@@ -45,7 +45,7 @@
         <p class="ml-3">Posts({{posts|length}})</p>
         {%for post in posts%}
         <div class="sub-new-post">
-          <p class="original-content">{{ post.content }}</p>
+          <p class="original">{{ post.content }}</p>
           <p><i>{{ post.timestamp }}</i></p>
           <div class="like">       
             <button type="button" data-post-id="{{ post.id }}" class="like-btn liked" id="btnLike">
