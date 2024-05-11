@@ -7,7 +7,7 @@
    <div class="col-3 left">
     {%if request.user.is_authenticated%}
       <div class="d-flex person">
-         <img src="{% static 'network/images/person.png' %}" alt='person' width="100" height="85" />
+         <img src="{% static 'network/images/person.png' %}" alt='person' width="90" height="75" />
          <div class="sub-person ml-2">
             <h5>{{request.user.username}}</h5>
             <p><i>{{request.user.email}}</i></p>
@@ -31,7 +31,7 @@
          </form>
        </div>
        {%if post_counts%}
-       <p class="ml-3">Posts: {{post_counts}}</p>
+       <p class="ml-3">Posts({{post_counts}})</p>
        {%endif%}
      {%if posts and like_counts%}
        <div class="new-post">
@@ -54,7 +54,7 @@
                <button type="submit" class="btn btn-sm btn-primary mb-2">Save Changes</button>
              </form>
            </div>
-           <div id="original-content-{{ post.id }}">
+           <div id="original-content-{{ post.id }}" class="original">
               {%if request.user == post.poster%}
               <button type="submit" class="pencil-circle" onclick="enableEdit({{ post.id }})"><i class="bi bi-pencil-fill pencil" id="btnEdit"></i></button>
               {%endif%}
@@ -107,9 +107,7 @@
       let editableContent=document.querySelector(`#editable-content-${postId}`)
       let originContent=document.querySelector(`#original-content-${postId}`)
       let btnEdit=document.querySelector("#btnEdit") 
-     
-       //alert('btnEdit got invoked')
- 
+
         if(editableContent.style.display==="block"){
           editableContent.style.display="none"
           originContent.style.display="block"
@@ -119,7 +117,6 @@
           originContent.style.display="none"
           btnEdit.style.display="none"
         }
-   }
-   
+   }   
  </script>
 {% endblock %}

@@ -1,5 +1,6 @@
 .profile-container{
    box-sizing: border-box;
+   margin:0 15px;
 }
 .sub-profile{
    margin:15px;  
@@ -7,8 +8,7 @@
 }
 .post-content{
    padding: 5px;
-   border-radius: 5px;
-   
+   border-radius: 5px;   
 }
 .follow,.unfollow{
    border-radius: 15px;

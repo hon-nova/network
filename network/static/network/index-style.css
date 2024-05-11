@@ -1,3 +1,16 @@
+@media (max-width: 767.98px) {
+   .left {
+      display: flex;
+      flex-direction: column;
+   }
+   .sub-person {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      width:100%;
+  }
+}
+
 .index-container{
    margin:0 15px;
    box-sizing: border-box;
@@ -42,11 +55,15 @@
 #btnLike {
    border:none;
 }
+.pencil-circle{
+border:none;
+color:blue;
+}
 
-#original-content{
-   position: relative;
-   border-left: 5px dotted  black;
-   border-right:5px dotted  black;
+.original{
+   
+   border-left: 5px dotted goldenrod;
+   border-right:5px dotted  goldenrod;
    padding-left: 5px;   
    margin: 5px;
 }
@@ -54,11 +71,18 @@
    color: blue;
    cursor: pointer;  
 }
-
 .input-textarea{
    width: 80%;
    height: 80px;
    margin: 10px;
    padding: 5px;
    color: #006699;
+}
+/* .active {
+   color: blue; 
+   background-color: whitesmoke;
+} */
+.nav-link a:active{
+   color: blue; 
+   background-color: whitesmoke;
 }

@@ -105,12 +105,24 @@ def profile(request,poster_id):
         this_user=User.objects.get(pk=poster_id)
         all_user_posts=this_user.posts.all()
         all_user_posts=all_user_posts.order_by('-timestamp')
-       
+
+        post_counts=len(all_user_posts)
         number_of_my_followers=this_user.followers.count()
        
         number_of_my_following=this_user.following_users.count()
+        # pagination
+        paginator = Paginator(all_user_posts, 10) 
+        page = request.GET.get('page', 1)
+        try:
+            all_user_posts = paginator.page(page)
+        except PageNotAnInteger:
+            all_user_posts = paginator.page(1)
+        except EmptyPage:
+            all_user_posts = paginator.page(paginator.num_pages)
+            
+        # end pagination
        
-        return render(request,'network/profile.html',{'posts':all_user_posts,'num_followers':number_of_my_followers,'num_following':number_of_my_following,'poster':this_user})
+        return render(request,'network/profile.html',{'posts':all_user_posts,'num_followers':number_of_my_followers,'num_following':number_of_my_following,'poster':this_user,'post_counts':post_counts})
     
     else:
         return redirect('login')  
@@ -168,7 +180,7 @@ def following(request):
         all_users_posts=all_users_posts.order_by('-timestamp')
         logging.debug(f'all_users_posts::{all_users_posts}')        
         
-        paginator = Paginator(all_users_posts, 4) 
+        paginator = Paginator(all_users_posts, 10) 
         page = request.GET.get('page', 1)
         try:
             all_users_posts = paginator.page(page)
