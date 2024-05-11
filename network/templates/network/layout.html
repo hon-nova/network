@@ -10,6 +10,8 @@
         <link href="{% static 'network/index-style.css' %}" rel="stylesheet">
         <link href="{% static 'network/profile-style.css' %}" rel="stylesheet">
         <link href="{% static 'network/following-style.css' %}" rel="stylesheet">
+        <link href="{% static 'network/layout-style.css' %}" rel="stylesheet">
+      
         {%block script%}{%endblock%}
     </head>
     <body>
@@ -19,11 +21,11 @@
               <ul class="navbar-nav mr-auto">  
                <li><img src="{% static 'network/images/network.png' %}" width="50" height="50" class="network-icon"/></li>
                 <li class="nav-item">
-                  <a class="nav-link" href="{% url 'index' %}">All Posts</a>
+                  <a class="nav-link {% if request.path == '' %}active{% endif %}" href="{% url 'index' %}">All Posts</a>
                 </li>
                 {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'following'%}">Following</a>
+                        <a class="nav-link {% if request.path == '/following' %}active{% endif %}" href="{% url 'following'%}">Following</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
