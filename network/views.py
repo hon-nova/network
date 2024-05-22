@@ -111,7 +111,7 @@ def profile(request,poster_id):
        
         number_of_my_following=this_user.following_users.count()
         # pagination
-        paginator = Paginator(all_user_posts, 10) 
+        paginator = Paginator(all_user_posts, 4) 
         page = request.GET.get('page', 1)
         try:
             all_user_posts = paginator.page(page)
